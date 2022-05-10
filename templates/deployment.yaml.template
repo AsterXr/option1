@@ -1,0 +1,41 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: option1-deployment
+spec:
+  replicas: 3
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+  selector:
+    matchLabels:
+      app: option1
+  template:
+    metadata:
+      labels:
+        app: option1
+    spec:
+      serviceAccount: option1-serviceaccount
+      containers:
+      - name: hello-from
+        imagePullPolicy: Never
+        image: %%IMAGE_NAME%%
+        ports:
+          - name: http
+            containerPort: 80
+        env:
+          - name: API_KEY
+            valueFrom:
+              secretKeyRef:
+                name: option1-secret
+                key: API_KEY
+          - name: API_KEY2
+            valueFrom:
+              secretKeyRef:
+                name: option1-secret
+                key: token
+      terminationGracePeriodSeconds: 1
+
+
